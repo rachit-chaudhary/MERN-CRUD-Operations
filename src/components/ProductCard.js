@@ -70,7 +70,7 @@ function ProductCard(props) {
                 </button>{" "}
                 <button
                   onClick={async () => {
-                    const test = Axios.delete(`/animal/${props.id}`)
+                    const test = Axios.delete(`/product/${props.id}`)
                     props.setProducts(prev => {
                       return prev.filter(product => {
                         return product._id != props.id

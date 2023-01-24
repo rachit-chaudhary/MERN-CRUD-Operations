@@ -90,10 +90,10 @@ app.get('/contact', async (req, res) => {
     })
 })
 
-app.use(passwordProtected)
+//app.use(passwordProtected)
 
 //route for admin
-app.get('/admin', async (req, res) => {
+app.get('/admin', passwordProtected, async (req, res) => {
     const allProducts = await db.collection("products").find().toArray()
     res.render('admin', {
         allProducts
@@ -101,24 +101,24 @@ app.get('/admin', async (req, res) => {
 })
 
 //route for api
-app.get("/api/products", async (req, res) => {
+app.get("/api/products", passwordProtected, async (req, res) => {
     const allProducts = await db.collection("products").find().toArray()
     res.json(allProducts)
 })
 
-app.post("/create-product", upload.single("photo"), ourCleanup, async (req, res) => {
+app.post("/create-product", passwordProtected, upload.single("photo"), ourCleanup, async (req, res) => {
     if (req.file) {
         const photofilename = `${Date.now()}.jpg`
         await sharp(req.file.buffer).resize(844, 456).jpeg({quality: 60}).toFile(path.join("public", "uploaded-photos", photofilename))
         req.cleanData.photo = photofilename
     }
-    console.log(req.body)
+    //console.log(req.body)
     const info = await db.collection("products").insertOne(req.cleanData)
     const newProduct = await db.collection("products").findOne({_id: new ObjectId(info.insertedId)})
     res.send(newProduct)
 })
 
-app.delete("/product/:id",async (req, res) => {
+app.delete("/product/:id", passwordProtected, async (req, res) => {
     if(typeof req.params.id != "string") req.params.id = ""
     const doc = await db.collection("products").findOne({_id: new ObjectId(req.params.id)})
     if(doc.photo) {
@@ -128,7 +128,7 @@ app.delete("/product/:id",async (req, res) => {
     res.send("successfully delete")
 })
 
-app.post("/update-product", upload.single("photo"), ourCleanup, async (req, res) => {
+app.post("/update-product", passwordProtected, upload.single("photo"), ourCleanup, async (req, res) => {
     if (req.file) {
         // if they are upload a new photo
         const photofilename = `${Date.now()}.jpg`
